@@ -17,6 +17,7 @@ const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/users");
 const taskRoutes = require("./routes/tasks");
 const eventsRoutes = require("./routes/events");
+const profileRoutes = require("./routes/profile");
 const locationsRoutes = require("./routes/locations")
 const participationsRoutes = require("./routes/participations");
 
@@ -26,6 +27,7 @@ app.use("/api/v1", userRoutes);
 app.use("/api/v1", taskRoutes);
 app.use("/api/v1", eventsRoutes);
 app.use("/api/v1", locationsRoutes);
+app.use("/api/v1", profileRoutes);
 app.use("/api/v1", participationsRoutes);
 
 app.listen(3000, () => {
