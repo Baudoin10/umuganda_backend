@@ -15,10 +15,12 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Import routes
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/users");
+const taskRoutes = require("./routes/tasks");
 
 // Use routes
 app.use("/api/v1", loginRoutes);
 app.use("/api/v1", userRoutes);
+app.use("/api/v1", taskRoutes);
 
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");

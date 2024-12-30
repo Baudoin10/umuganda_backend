@@ -2,7 +2,7 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API Documentation",
+      title: "Umuganda API Project Documentation",
       version: "1.0.0",
       description: "Umuganda API Project Documentation",
       contact: {
