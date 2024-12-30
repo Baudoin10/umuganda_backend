@@ -4,7 +4,7 @@ const swaggerOptions = {
     info: {
       title: "API Documentation",
       version: "1.0.0",
-      description: "API documentation for my project",
+      description: "Umuganda API Project Documentation",
       contact: {
         name: "Your Name",
         email: "your_email@example.com",
