@@ -1,3 +1,4 @@
+
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -13,6 +14,20 @@ const swaggerOptions = {
     servers: [
       {
         url: "http://localhost:3000", // Change this to match your API base URL
+      },
+    ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT", // Optional: Specify the token format
+        },
+      },
+    },
+    security: [
+      {
+        BearerAuth: [], // Applies BearerAuth globally to all routes
       },
     ],
   },
