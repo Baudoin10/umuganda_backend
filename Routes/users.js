@@ -55,9 +55,9 @@ let users = []; // In-memory storage
 router.post(
   "/users",
   [
-    check("firstName").notEmpty().withMessage("First name is required"),
-    check("username").notEmpty().withMessage("Username is required"),
-    check("password").notEmpty().withMessage("Password is required"),
+    check("firstName").notEmpty().withMessage("firstName is required"),
+    check("username").notEmpty().withMessage("username is required"),
+    check("password").notEmpty().withMessage("password is required"),
     check("email").isEmail().withMessage("Invalid email format"),
   ],
   (req, res) => {
