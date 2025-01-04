@@ -4,7 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerOptions = require("./swaggerOptions");
 
 const app = express();
-app.use(express.json()); 
+app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Swagger configuration
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
