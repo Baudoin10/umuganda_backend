@@ -75,7 +75,7 @@ router.post(
     };
 
     participations.push(newParticipation);
-
+    
     res.status(201).json(newParticipation);
   }
 );
