@@ -137,8 +137,12 @@ router.post(
 
     events.push(newEvent);
 
-    res.status(201).json(newEvent);
+    res.status(201).json({
+      message: "Event created successfully",
+      event: newEvent,
+    });
   }
 );
+
 
 module.exports = router;
