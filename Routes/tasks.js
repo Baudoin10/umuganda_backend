@@ -335,6 +335,7 @@ router.put("/tasks/:id/reject", (req, res) => {
 router.delete("/tasks/:id", (req, res) => {
   const taskId = parseInt(req.params.id);
   const taskIndex = tasks.findIndex((t) => t.id === taskId);
+  
 
   if (taskIndex !== -1) {
     tasks.splice(taskIndex, 1);
