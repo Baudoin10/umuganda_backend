@@ -124,6 +124,7 @@ router.post(
     }
 
     const { title, description, address, date, day, month } = req.body;
+    
 
     const newEvent = {
       id: events.length + 1,
