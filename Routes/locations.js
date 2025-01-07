@@ -232,7 +232,7 @@ router.get("/locations/nearby", (req, res) => {
 
 // Helper function to calculate distance (Haversine formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371e3;
+  const R = 6371e3; // Earth radius in meters
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
   const Δφ = ((lat2 - lat1) * Math.PI) / 180;
