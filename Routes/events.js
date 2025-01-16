@@ -123,6 +123,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    
     const { title, description, address, date, day, month } = req.body;
     
     const newEvent = {
