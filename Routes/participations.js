@@ -5,47 +5,7 @@ const { check, validationResult } = require("express-validator");
 // In-memory participation storage
 let participations = [];
 
-/**
- * @swagger
- * tags:
- *   name: Participation Management
- *   description: Endpoints for managing user participation in tasks and events
- */
-
-/**
- * @swagger
- * /api/v1/participation:
- *   post:
- *     summary: Log user participation
- *     tags: [Participation Management]
- *     description: Endpoint for logging user participation in tasks or events
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: integer
- *                 description: ID of the user
- *               type:
- *                 type: string
- *                 description: Type of participation (task/event)
- *                 enum: [task, event]
- *               itemId:
- *                 type: integer
- *                 description: ID of the task or event
- *               timestamp:
- *                 type: string
- *                 format: date-time
- *                 description: Date and time of participation
- *     responses:
- *       201:
- *         description: Participation logged successfully
- *       400:
- *         description: Bad Request
- */
+// Log user participation
 router.post(
   "/participation",
   [
@@ -75,7 +35,7 @@ router.post(
     };
 
     participations.push(newParticipation);
-    
+
     res.status(201).json(newParticipation);
   }
 );

@@ -18,43 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-/**
- * @swagger
- * tags:
- *   name: Admin Profile Management
- *   description: Endpoints for managing admin profiles
- */
-
-/**
- * @swagger
- * /api/v1/admin/profile:
- *   post:
- *     summary: Update admin profile
- *     tags: [Admin Profile Management]
- *     description: Endpoint for updating admin profile details including first name, last name, email, and password
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
- *     responses:
- *       200:
- *         description: Profile updated successfully
- *       400:
- *         description: Bad Request
- */
+// Update admin profile
 router.post(
   "/admin/profile",
   [
@@ -78,40 +42,16 @@ router.post(
   }
 );
 
-/**
- * @swagger
- * /api/v1/admin/profile/upload-picture:
- *   post:
- *     summary: Upload profile picture
- *     tags: [Admin Profile Management]
- *     description: Endpoint for uploading admin profile picture
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               picture:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Picture uploaded successfully
- *       400:
- *         description: Bad Request
- */
+// Upload profile picture
 router.post(
   "/admin/profile/upload-picture",
   upload.single("picture"),
   (req, res) => {
     if (req.file) {
-      res
-        .status(200)
-        .json({
-          message: "Picture uploaded successfully",
-          picture: req.file.path,
-        });
+      res.status(200).json({
+        message: "Picture uploaded successfully",
+        picture: req.file.path,
+      });
     } else {
       res.status(400).json({ message: "Picture upload failed" });
     }
