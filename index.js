@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const eventRoutes = require("./routes/eventRoutes");
 
 const port = 3000; 
 
@@ -11,6 +12,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", eventRoutes);
 
 app.get("/", (req, res) => {
   res.send(""); 
