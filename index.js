@@ -4,6 +4,7 @@ const app = express();
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 
 const port = 3000; 
 
@@ -13,6 +14,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", eventRoutes);
+app.use("/api", taskRoutes);
+
 
 app.get("/", (req, res) => {
   res.send(""); 
