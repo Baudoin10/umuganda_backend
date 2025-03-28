@@ -1,8 +1,8 @@
 // index.js
 const express = require("express");
 const app = express();
-const authRoutes = require("../routes/authRoutes");
-const userRoutes = require("../routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const port = 3000; 
 
