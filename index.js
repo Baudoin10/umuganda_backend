@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const port = 3000; 
 
@@ -15,6 +16,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", eventRoutes);
 app.use("/api", taskRoutes);
+app.use("/api", notificationRoutes);
 
 
 app.get("/", (req, res) => {
