@@ -1,12 +1,14 @@
 const Task = require("../models/taskModel");
 
-
-const searchtasks = async (req, res) => {
+// Search task
+const searchtask = async (req, res) => {
   try {
-    const { query } = req.query; 
+    const { query } = req.query;
+
     if (!query) {
       return res.status(400).json({ message: "Search query is required" });
     }
+
     const searchRegex = new RegExp(query, "i");
     const tasks = await Task.find({
       $or: [
@@ -26,4 +28,4 @@ const searchtasks = async (req, res) => {
   }
 };
 
-module.exports = { searchtasks };
+module.exports = { searchtask };
