@@ -10,7 +10,7 @@ const taskSchema = new mongoose.Schema(
       required: true,
       enum: ["Pending", "In Progress", "Completed"],
     },
-    date: { type: String, required: true }, // You can also use Date type if needed
+    date: { type: String, required: true }, 
   },
   { timestamps: true }
 );
