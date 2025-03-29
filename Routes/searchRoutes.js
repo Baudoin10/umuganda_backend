@@ -1,9 +1,9 @@
 const express = require("express");
-const { searchTasks } = require("../controllers/taskController");
+const { searchtasks } = require("../controllers/taskController");
 
 const router = express.Router();
 
-// Search Tasks Route
-router.get("/search", searchTasks);
+// Search tasks route
+router.get("/search", searchtasks);
 
 module.exports = router;
