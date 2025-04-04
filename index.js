@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require ("mongoose")
 const cors = require("cors")
 
-
 const app = express();
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -12,10 +11,16 @@ const taskRoutes = require("./routes/taskRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const searchRoutes = require("./routes/searchRoutes")
 
+const dbURI = "mongodb+srv://baudoin:muganda123456@cluster0.xhaqyxk.mongodb.net/umuganda?retryWrites=true&w=majority";
 
-const port = 3000; 
+mongoose
+.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => console.log("Connected to MongoDB Atlas"))
+.catch((err) => console.log("Error connecting to MongoDB Atlas:", err));
 
+app.use(express.json());
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
@@ -26,11 +31,13 @@ app.use("/api", notificationRoutes);
 app.use("/api", searchRoutes);
 
 
-app.get("/", (req, res) => {
-  res.send(""); 
-});
+// app.get("/", (req, res) => {
+//   res.send(""); 
+// });
 
 // Start the server
+
+const port = 3000; 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
