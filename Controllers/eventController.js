@@ -2,7 +2,7 @@ const Event = require("../models/eventModel");
 
 // Create a new event
 const createEvent = async (req, res) => {
-  const { title, description, address, date, day, month } = req.body;
+  const { title, description, address, date, day, month,status } = req.body;
 
   try {
     const newEvent = new Event({
@@ -12,6 +12,7 @@ const createEvent = async (req, res) => {
       date,
       day,
       month,
+      status: status || 'Open',
     });
     const savedEvent = await newEvent.save();
     res.status(201).json(savedEvent);
@@ -53,6 +54,7 @@ const updateEvent = async (req, res) => {
     event.date = req.body.date || event.date;
     event.day = req.body.day || event.day;
     event.month = req.body.month || event.month;
+    event.status = req.body.status || event.status;
 
     const updatedEvent = await event.save();
     res.json(updatedEvent);
