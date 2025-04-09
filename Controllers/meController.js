@@ -1,15 +1,18 @@
+
+
 const User = require("../models/userModel");
 
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select(
-      "username email role"
+      "firstname lastname email role"
     );
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({
-      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
       email: user.email,
       role: user.role,
     });
@@ -17,4 +20,5 @@ const getCurrentUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 module.exports = { getCurrentUser };

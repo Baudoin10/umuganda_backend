@@ -32,7 +32,7 @@ app.use("/api", taskRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api", searchRoutes);
 app.use("/api", detailevent);
-app.use("/api", meRoutes);
+app.use("/api/me", meRoutes);
 
 
 const port = 3000; 
