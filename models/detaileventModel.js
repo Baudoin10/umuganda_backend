@@ -10,7 +10,7 @@ const detaileventSchema = new mongoose.Schema(
     date: { type: String, required: true },
     day: { type: String, required: true },
     month: { type: String, required: true },
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Array to store participants' IDs
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
   },
   { timestamps: true }
 );
