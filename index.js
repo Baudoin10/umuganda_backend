@@ -10,6 +10,7 @@ const eventRoutes = require("./routes/eventRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const searchRoutes = require("./routes/searchRoutes")
+const detailevent = require("./routes/detaileventRoutes")
 
 const dbURI = "mongodb+srv://baudoin:muganda123456@cluster0.xhaqyxk.mongodb.net/umuganda?retryWrites=true&w=majority";
 
@@ -29,6 +30,7 @@ app.use("/api", eventRoutes);
 app.use("/api", taskRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api", searchRoutes);
+app.use("/api", detailevent);
 
 
 const port = 3000; 
