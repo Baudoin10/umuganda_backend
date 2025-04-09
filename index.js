@@ -11,6 +11,7 @@ const taskRoutes = require("./routes/taskRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const searchRoutes = require("./routes/searchRoutes")
 const detailevent = require("./routes/detaileventRoutes")
+const meRoutes = require("./routes/meRoutes");
 
 const dbURI = "mongodb+srv://baudoin:muganda123456@cluster0.xhaqyxk.mongodb.net/umuganda?retryWrites=true&w=majority";
 
@@ -31,6 +32,7 @@ app.use("/api", taskRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api", searchRoutes);
 app.use("/api", detailevent);
+app.use("/api", meRoutes);
 
 
 const port = 3000; 
