@@ -30,7 +30,7 @@ const taskSchema = new mongoose.Schema(
       enum: ["Pending", "In Progress", "Completed"],
     },
     date: { type: String, required: true },
-    photo: { type: String, required: false },  // Added to store image URL
+    photo: { type: String, required: false },  
   }
 );
 

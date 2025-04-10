@@ -1,20 +1,54 @@
-const notification = require("../models/notificationModel");
 
-// Create a new notification
+const notification = require("../models/notificationModel");
+const User = require("../models/userModel"); 
+
 const createNotification = async (req, res) => {
-  const { title, message, userId } = req.body;
+  const { title, message, targetUserIds } = req.body;
 
   try {
-    const newNotification = new notification({
-      title,
-      message,
-      userId,
-    });
-
-    const savedNotification = await newNotification.save();
-    res.status(201).json(savedNotification);
+    if (!title || !message) {
+      return res.status(400).json({ message: "Title and message are required" });
+    }
+    if (targetUserIds === "all") {
+      const users = await User.find({}, '_id');
+      const userIds = users.map(user => user._id);
+      
+      const notifications = userIds.map(userId => ({
+        title,
+        message,
+        userId
+      }));
+      
+      // Insert all notifications at once
+      const savedNotifications = await notification.insertMany(notifications);
+      return res.status(201).json({ 
+        message: `Notification sent to ${userIds.length} users`, 
+        count: userIds.length 
+      });
+    } 
+    // Handle specific users
+    else if (Array.isArray(targetUserIds) && targetUserIds.length > 0) {
+      // Create notifications for selected users
+      const notifications = targetUserIds.map(userId => ({
+        title,
+        message,
+        userId
+      }));
+      
+      // Insert all notifications at once
+      const savedNotifications = await notification.insertMany(notifications);
+      return res.status(201).json({ 
+        message: `Notification sent to ${targetUserIds.length} users`, 
+        count: targetUserIds.length 
+      });
+    } else {
+      return res.status(400).json({ 
+        message: "Invalid targetUserIds. Must be 'all' or a non-empty array of user IDs" 
+      });
+    }
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("Error creating notifications:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
