@@ -31,6 +31,42 @@ const getEvents = async (req, res) => {
   }
 };
 
+
+const getAllEvents = async (req, res) => {
+  try {
+    const events = await Detailevent.find();
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+// Join an event 
+const joinEvent = async (req, res) => {
+  const { eventId, userId } = req.body;
+
+  try {
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    if (!event.participants) {
+      event.participants = [];
+    }
+    if (event.participants.includes(userId)) {
+      return res.status(400).json({ message: "User has already joined this event" });
+    }
+
+    event.participants.push(userId);
+    const updatedEvent = await event.save();
+
+    res.status(200).json({ message: "Successfully joined the event", event: updatedEvent });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Get a single event by ID
 const getEventById = async (req, res) => {
   try {
@@ -82,4 +118,6 @@ module.exports = {
   getEventById,
   updateEvent,
   deleteEvent,
+  getAllEvents,
+  joinEvent,
 };

@@ -1,4 +1,4 @@
-// detaileventModel.js
+
 
 const mongoose = require("mongoose");
 
