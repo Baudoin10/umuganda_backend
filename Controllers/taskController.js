@@ -1,18 +1,111 @@
 
-const task = require("../models/taskModel");
+// const task = require("../models/taskModel");
+
+// // Create a new task
+// const createTask = async (req, res) => {
+//   const { title, description, location, status, date, photo } = req.body;
+
+//   try {
+//     const newTask = new task({
+//       title,
+//       description,
+//       location,
+//       status,
+//       date,
+//       photo, 
+//     });
+
+//     const savedTask = await newTask.save();
+//     res.status(201).json(savedTask);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+// // Get all tasks
+// const getTasks = async (req, res) => {
+//   try {
+//     const tasks = await task.find();
+//     res.json(tasks);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// // Get task by ID
+// const getTaskById = async (req, res) => {
+//   try {
+//     const task = await task.findById(req.params.id);
+//     if (!task) return res.status(404).json({ message: "Task not found" });
+//     res.json(task);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// // Update task
+// const updateTask = async (req, res) => {
+//   try {
+//     const task = await task.findById(req.params.id);
+//     if (!task) return res.status(404).json({ message: "Task not found" });
+
+//     task.title = req.body.title || task.title;
+//     task.description = req.body.description || task.description;
+//     task.location = req.body.location || task.location;
+//     task.status = req.body.status || task.status;
+//     task.date = req.body.date || task.date;
+//     task.photo = req.body.photo || task.photo; // Update photo if provided
+
+//     const updatedTask = await task.save();
+//     res.json(updatedTask);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+// // Delete task
+// const deleteTask = async (req, res) => {
+//   try {
+//     const task = await task.findById(req.params.id);
+//     if (!task) return res.status(404).json({ message: "Task not found" });
+
+//     await task.findByIdAndDelete(req.params.id);
+//     res.json({ message: "Task deleted successfully" });
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// module.exports = {
+//   createTask,
+//   getTasks,
+//   getTaskById,
+//   updateTask,
+//   deleteTask,
+// };
+
+const Task = require("../models/taskModel");
 
 // Create a new task
 const createTask = async (req, res) => {
-  const { title, description, location, status, date, photo } = req.body;
+  const { title, description, location, status, date, photo, assignedTo } = req.body;
 
   try {
-    const newTask = new task({
+    const newTask = new Task({
       title,
       description,
       location,
-      status,
+      status: status || "Pending",
       date,
-      photo, 
+      photo,
+      assignedTo,
+      statusHistory: [
+        {
+          status: status || "Pending",
+          updatedAt: new Date(),
+          updatedBy: req.user ? req.user.id : null
+        }
+      ]
     });
 
     const savedTask = await newTask.save();
@@ -25,7 +118,12 @@ const createTask = async (req, res) => {
 // Get all tasks
 const getTasks = async (req, res) => {
   try {
-    const tasks = await task.find();
+    // If user is not admin, only show their assigned tasks
+    const filter = req.user && req.user.role !== 'admin' 
+                  ? { assignedTo: req.user.id } 
+                  : {};
+                  
+    const tasks = await Task.find(filter);
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -35,9 +133,16 @@ const getTasks = async (req, res) => {
 // Get task by ID
 const getTaskById = async (req, res) => {
   try {
-    const task = await task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
-    res.json(task);
+    const foundTask = await Task.findById(req.params.id);
+    if (!foundTask) return res.status(404).json({ message: "Task not found" });
+    
+    // Check if user has permission to view this task
+    if (req.user.role !== 'admin' && foundTask.assignedTo && 
+        foundTask.assignedTo.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to view this task" });
+    }
+    
+    res.json(foundTask);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -46,19 +151,38 @@ const getTaskById = async (req, res) => {
 // Update task
 const updateTask = async (req, res) => {
   try {
-    const task = await task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    const foundTask = await Task.findById(req.params.id);
+    if (!foundTask) return res.status(404).json({ message: "Task not found" });
 
-    task.title = req.body.title || task.title;
-    task.description = req.body.description || task.description;
-    task.location = req.body.location || task.location;
-    task.status = req.body.status || task.status;
-    task.date = req.body.date || task.date;
-    task.photo = req.body.photo || task.photo; // Update photo if provided
+    // Basic updates
+    if (req.body.title) foundTask.title = req.body.title;
+    if (req.body.description) foundTask.description = req.body.description;
+    if (req.body.location) foundTask.location = req.body.location;
+    if (req.body.date) foundTask.date = req.body.date;
+    if (req.body.photo) foundTask.photo = req.body.photo;
+    
+    // Status update tracking
+    if (req.body.status && req.body.status !== foundTask.status) {
+      foundTask.status = req.body.status;
+      foundTask.lastUpdated = new Date();
+      
+      // Add to status history
+      foundTask.statusHistory.push({
+        status: req.body.status,
+        updatedAt: new Date(),
+        updatedBy: req.user ? req.user.id : null
+      });
+    }
+    
+    // Assignment update
+    if (req.body.assignedTo) {
+      foundTask.assignedTo = req.body.assignedTo;
+    }
 
-    const updatedTask = await task.save();
+    const updatedTask = await foundTask.save();
     res.json(updatedTask);
   } catch (err) {
+    console.error("Error updating task:", err);
     res.status(400).json({ message: err.message });
   }
 };
@@ -66,11 +190,37 @@ const updateTask = async (req, res) => {
 // Delete task
 const deleteTask = async (req, res) => {
   try {
-    const task = await task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    const foundTask = await Task.findById(req.params.id);
+    if (!foundTask) return res.status(404).json({ message: "Task not found" });
 
-    await task.findByIdAndDelete(req.params.id);
+    // Only admin can delete tasks
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Not authorized to delete tasks" });
+    }
+
+    await Task.findByIdAndDelete(req.params.id);
     res.json({ message: "Task deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get tasks by status (for admin dashboard)
+const getTasksByStatus = async (req, res) => {
+  try {
+    // Verify admin permission
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Admin access only" });
+    }
+    
+    const { status } = req.query;
+    const filter = status ? { status } : {};
+    
+    const tasks = await Task.find(filter)
+                           .populate('assignedTo', 'name email')
+                           .sort({ lastUpdated: -1 });
+                           
+    res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -82,4 +232,5 @@ module.exports = {
   getTaskById,
   updateTask,
   deleteTask,
+  getTasksByStatus
 };
