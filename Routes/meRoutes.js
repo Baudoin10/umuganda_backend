@@ -1,9 +1,7 @@
 
-
 const express = require("express");
 const { getCurrentUser } = require("../controllers/meController");
 const authMiddleware = require("../middleware/authMiddleware");
-
 const router = express.Router();
 
 /**
