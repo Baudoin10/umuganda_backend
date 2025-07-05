@@ -69,7 +69,6 @@ const updateUser = async (req, res) => {
     if (req.body.password && req.body.password.trim() !== "") {
       user.password = req.body.password;
     }
-
     const updatedUser = await user.save();
     res.json(updatedUser);
   } catch (err) {
