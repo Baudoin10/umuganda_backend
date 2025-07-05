@@ -38,24 +38,7 @@ const createUser = async (req, res) => {
   }
 };
 
-// Update user
-// const updateUser = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     if (!user) return res.status(404).json({ message: "User not found" });
 
-//     user.firstname = req.body.firstname;
-//     user.lastname = req.body.lastname;
-//     user.email = req.body.email;
-//     user.password = req.body.password;
-//     const updatedUser = await user.save();
-//     res.json(updatedUser);
-//   } catch (err) {
-//     res.status(400).json({ message: err.message });
-//   }
-// };
-
-// Update user
 const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
