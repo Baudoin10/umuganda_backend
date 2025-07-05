@@ -38,7 +38,6 @@ app.use("/api", searchRoutes);
 app.use("/api", detailevent);
 app.use("/api/me", meRoutes);
 
-
 const port = 3000; 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
