@@ -38,7 +38,6 @@ const createUser = async (req, res) => {
   }
 };
 
-
 const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -46,7 +45,6 @@ const updateUser = async (req, res) => {
     if (req.body.firstname) user.firstname = req.body.firstname;
     if (req.body.lastname) user.lastname = req.body.lastname;
     if (req.body.email) user.email = req.body.email;
-    // Only update password if provided and not empty
     if (req.body.password && req.body.password.trim() !== "") {
       user.password = req.body.password;
     }
