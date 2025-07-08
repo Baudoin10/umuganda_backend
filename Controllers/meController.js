@@ -1,5 +1,4 @@
 
-
 const User = require("../models/userModel");
 
 const getCurrentUser = async (req, res) => {
@@ -9,7 +8,7 @@ const getCurrentUser = async (req, res) => {
     );
 
     if (!user) return res.status(404).json({ message: "User not found" });
-
+    
     res.json({
       firstname: user.firstname,
       lastname: user.lastname,

@@ -8,7 +8,7 @@ const searchtask = async (req, res) => {
     if (!query) {
       return res.status(400).json({ message: "Search query is required" });
     }
-
+    
     const searchRegex = new RegExp(query, "i");
     const tasks = await Task.find({
       $or: [
