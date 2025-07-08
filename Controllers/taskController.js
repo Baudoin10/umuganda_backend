@@ -71,7 +71,6 @@ const updateTask = async (req, res) => {
   try {
     const foundTask = await Task.findById(req.params.id);
     if (!foundTask) return res.status(404).json({ message: "Task not found" });
-
     // Basic updates
     if (req.body.title) foundTask.title = req.body.title;
     if (req.body.description) foundTask.description = req.body.description;
@@ -96,7 +95,6 @@ const updateTask = async (req, res) => {
     if (req.body.assignedTo) {
       foundTask.assignedTo = req.body.assignedTo;
     }
-
     const updatedTask = await foundTask.save();
     res.json(updatedTask);
   } catch (err) {
