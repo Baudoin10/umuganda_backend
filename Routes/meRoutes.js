@@ -38,5 +38,4 @@ const router = express.Router();
  *         description: Unauthorized - user not authenticated
  */
 router.get("/", authMiddleware, getCurrentUser);
-
 module.exports = router;
