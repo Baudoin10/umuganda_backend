@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
@@ -6,10 +5,10 @@ const eventSchema = new mongoose.Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     address: { type: String, required: true },
-    date: { type: String, required: true }, 
-    day: { type: String, required: true },
-    month: { type: String, required: true },
-    status: { type: String, enum: ['Open', 'Closed'], default: 'Open' }, 
+    date: { type: String, required: true },
+    day: { type: String },
+    month: { type: String }, 
+    status: { type: String, enum: ["Open", "Closed"], default: "Open" },
   },
   { timestamps: true }
 );

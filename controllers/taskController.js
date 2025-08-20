@@ -24,7 +24,11 @@ const createTask = async (req, res) => {
     });
 
     const savedTask = await newTask.save();
-    res.status(201).json(savedTask);
+    const populated = await Task.findById(savedTask._id).populate(
+      "assignedTo",
+      "firstname"
+    ); // only firstname
+    res.status(201).json(populated);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -33,11 +37,11 @@ const createTask = async (req, res) => {
 // Get all tasks
 const getTasks = async (req, res) => {
   try {
-    // If user is not admin, only show their assigned tasks
-    const filter =
-      req.user && req.user.role !== "admin" ? { assignedTo: req.user.id } : {};
+    // If user is not admin, only show their assigned tasks (guard req.user)
+    const isAdmin = !!(req.user && req.user.role === "admin");
+    const filter = isAdmin ? {} : req.user ? { assignedTo: req.user.id } : {};
 
-    const tasks = await Task.find(filter);
+    const tasks = await Task.find(filter).populate("assignedTo", "firstname"); // only firstname
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -47,13 +51,18 @@ const getTasks = async (req, res) => {
 // Get task by ID
 const getTaskById = async (req, res) => {
   try {
-    const foundTask = await Task.findById(req.params.id);
+    const foundTask = await Task.findById(req.params.id).populate(
+      "assignedTo",
+      "firstname"
+    ); // only firstname
     if (!foundTask) return res.status(404).json({ message: "Task not found" });
 
+    const isAdmin = !!(req.user && req.user.role === "admin");
     if (
-      req.user.role !== "admin" &&
+      req.user &&
+      !isAdmin &&
       foundTask.assignedTo &&
-      foundTask.assignedTo.toString() !== req.user.id
+      foundTask.assignedTo._id.toString() !== req.user.id
     ) {
       return res
         .status(403)
@@ -71,6 +80,7 @@ const updateTask = async (req, res) => {
   try {
     const foundTask = await Task.findById(req.params.id);
     if (!foundTask) return res.status(404).json({ message: "Task not found" });
+
     // Basic updates
     if (req.body.title) foundTask.title = req.body.title;
     if (req.body.description) foundTask.description = req.body.description;
@@ -83,7 +93,6 @@ const updateTask = async (req, res) => {
       foundTask.status = req.body.status;
       foundTask.lastUpdated = new Date();
 
-      // Add to status history
       foundTask.statusHistory.push({
         status: req.body.status,
         updatedAt: new Date(),
@@ -92,29 +101,27 @@ const updateTask = async (req, res) => {
     }
 
     // Assignment update
-    if (req.body.assignedTo) {
+    if (req.body.assignedTo !== undefined) {
       foundTask.assignedTo = req.body.assignedTo;
     }
+
     const updatedTask = await foundTask.save();
-    res.json(updatedTask);
+    const populated = await Task.findById(updatedTask._id).populate(
+      "assignedTo",
+      "firstname"
+    ); // only firstname
+    res.json(populated);
   } catch (err) {
     console.error("Error updating task:", err);
     res.status(400).json({ message: err.message });
   }
 };
 
-// Delete task
+// Delete task (same behavior as user delete — no role check)
 const deleteTask = async (req, res) => {
   try {
     const foundTask = await Task.findById(req.params.id);
     if (!foundTask) return res.status(404).json({ message: "Task not found" });
-
-    // Only admin can delete tasks
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to delete tasks" });
-    }
 
     await Task.findByIdAndDelete(req.params.id);
     res.json({ message: "Task deleted successfully" });
@@ -123,11 +130,10 @@ const deleteTask = async (req, res) => {
   }
 };
 
-// Get tasks by status (for admin dashboard)
+// Get tasks by status (admin dashboard)
 const getTasksByStatus = async (req, res) => {
   try {
-    // Verify admin permission
-    if (req.user.role !== "admin") {
+    if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({ message: "Admin access only" });
     }
 
@@ -135,7 +141,7 @@ const getTasksByStatus = async (req, res) => {
     const filter = status ? { status } : {};
 
     const tasks = await Task.find(filter)
-      .populate("assignedTo", "name email")
+      .populate("assignedTo", "firstname") // only firstname
       .sort({ lastUpdated: -1 });
 
     res.json(tasks);

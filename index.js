@@ -5,6 +5,8 @@ const cors = require("cors")
 
 const swaggerDocs = require("./swagger");
 
+
+
 const app = express();
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -38,7 +40,12 @@ app.use("/api", searchRoutes);
 app.use("/api", detailevent);
 app.use("/api/me", meRoutes);
 
-const port = 3000; 
+const port = process.env.PORT || 3000;
+
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  if (process.env.RENDER_EXTERNAL_URL) {
+    console.log(`Server running at ${process.env.RENDER_EXTERNAL_URL}`);
+  } else {
+    console.log(`Server running at http://localhost:${port}`);
+  }
 });

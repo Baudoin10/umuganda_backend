@@ -28,6 +28,8 @@ const createUser = async (req, res) => {
     lastname: req.body.lastname,
     email: req.body.email,
     password: req.body.password,
+    role: req.body.role || "user",
+    status: req.body.status || "Active", // ✅ set default if not passed
   });
 
   try {
@@ -38,16 +40,22 @@ const createUser = async (req, res) => {
   }
 };
 
+// Update user
 const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
+
     if (req.body.firstname) user.firstname = req.body.firstname;
     if (req.body.lastname) user.lastname = req.body.lastname;
     if (req.body.email) user.email = req.body.email;
+    if (req.body.role) user.role = req.body.role;
+    if (req.body.status) user.status = req.body.status; // ✅ update status
+
     if (req.body.password && req.body.password.trim() !== "") {
       user.password = req.body.password;
     }
+
     const updatedUser = await user.save();
     res.json(updatedUser);
   } catch (err) {
@@ -77,6 +85,3 @@ module.exports = {
   updateUser,
   deleteUser,
 };
-
-
-
