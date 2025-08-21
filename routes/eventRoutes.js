@@ -7,6 +7,9 @@ const {
   updateEvent,
   deleteEvent,
   joinEvent,
+  // ✅ new controllers
+  getParticipants,
+  updateParticipantStatus,
 } = require("../controllers/eventController");
 
 /**
@@ -28,18 +31,11 @@ const {
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - title
- *               - description
- *               - address
- *               - date
+ *             required: [title, description, address, date]
  *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               address:
- *                 type: string
+ *               title: { type: string }
+ *               description: { type: string }
+ *               address: { type: string }
  *               date:
  *                 type: string
  *                 format: date
@@ -73,14 +69,10 @@ router.get("/events", getEvents);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - userId
- *               - eventId
+ *             required: [userId, eventId]
  *             properties:
- *               userId:
- *                 type: string
- *               eventId:
- *                 type: string
+ *               userId: { type: string }
+ *               eventId: { type: string }
  *     responses:
  *       200:
  *         description: User joined event successfully
@@ -99,8 +91,7 @@ router.post("/events/join", joinEvent);
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Event ID
  *     responses:
  *       200:
@@ -120,8 +111,7 @@ router.get("/events/:id", getEventById);
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Event ID
  *     requestBody:
  *       required: true
@@ -130,15 +120,15 @@ router.get("/events/:id", getEventById);
  *           schema:
  *             type: object
  *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               address:
- *                 type: string
+ *               title: { type: string }
+ *               description: { type: string }
+ *               address: { type: string }
  *               date:
  *                 type: string
  *                 format: date
+ *               status:
+ *                 type: string
+ *                 enum: [Open, Closed]
  *     responses:
  *       200:
  *         description: Event updated successfully
@@ -157,8 +147,7 @@ router.put("/events/:id", updateEvent);
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Event ID
  *     responses:
  *       200:
@@ -167,5 +156,79 @@ router.put("/events/:id", updateEvent);
  *         description: Event not found
  */
 router.delete("/events/:id", deleteEvent);
+
+/* ============================
+   Participation (Admin)
+   ============================ */
+
+/**
+ * @swagger
+ * /api/events/{eventId}/participants:
+ *   get:
+ *     summary: List participants of an event (filter + pagination)
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Search by name/email
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [joined, present, absent]
+ *       - in: query
+ *         name: sector
+ *         schema: { type: string }
+ *         description: Sector name
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 10 }
+ *     responses:
+ *       200:
+ *         description: Paginated participants
+ */
+router.get("/events/:eventId/participants", getParticipants);
+
+/**
+ * @swagger
+ * /api/events/{eventId}/participants/{userId}:
+ *   put:
+ *     summary: Update a participant's status (present/absent)
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema: { type: string }
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [present, absent]
+ *     responses:
+ *       200:
+ *         description: Status updated
+ *       404:
+ *         description: Event/participant not found
+ */
+router.put("/events/:eventId/participants/:userId", updateParticipantStatus);
 
 module.exports = router;
