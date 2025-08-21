@@ -1,89 +1,96 @@
-
 const User = require("../models/userModel");
-const bcrypt = require("bcryptjs"); 
-const jwt = require("jsonwebtoken"); 
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-let blacklistedTokens = []; 
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+let blacklistedTokens = [];
 
-// User registration
+// POST /api/auth/register
 const registerUser = async (req, res) => {
-  const { firstname, lastname, email, password, role } = req.body;
-
   try {
-    const userExists = await User.findOne({ email });
+    const {
+      firstname,
+      lastname,
+      email,
+      password,
+      role,
+      phone,
+      sector,
+      address,
+    } = req.body;
+
+    const normEmail = String(email || "")
+      .trim()
+      .toLowerCase();
+
+    const userExists = await User.findOne({ email: normEmail });
     if (userExists)
       return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
+
+    const user = await User.create({
       firstname,
       lastname,
-      email,
+      email: normEmail,
       password: hashedPassword,
-      role,
+      phone, // ✅ now saved
+      sector, // ✅ now saved
+      address, // ✅ now saved
+      role: role || "user",
+      // status uses model default "Active"
     });
 
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+    // return only what you need on client
+    res.status(201).json({ userId: user._id, role: user.role });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// User login
+// POST /api/auth/login
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const email = String(req.body.email || "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body.password || "");
+
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (user.status === "Inactive")
+      return res.status(403).json({ message: "Account inactive" });
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { userId: user._id, role: user.role }, // Include role in token
-      "your_jwt_secret", // You should replace this with an actual secret in production
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.json({ token, role: user.role }); // Send role to frontend
+    res.json({ token, role: user.role, userId: user._id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Logout user
+// POST /api/auth/logout
 const logoutUser = (req, res) => {
-  console.log(req.headers); // Check if token is received
-
-  const token = req.header("Authorization")?.split(" ")[1]; // Extract token from Authorization header
-
+  const token = req.header("Authorization")?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
 
   try {
-    // Check if the token is in the blacklist
     if (blacklistedTokens.includes(token)) {
       return res.status(400).json({ message: "Token already logged out" });
     }
-
-    // Verify token
-    jwt.verify(token, "your_jwt_secret");
-
-    // Add token to blacklist (invalidate it)
+    jwt.verify(token, JWT_SECRET);
     blacklistedTokens.push(token);
     res.status(200).json({ message: "Logout successful" });
-  } catch (err) {
+  } catch {
     res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
 const isTokenBlacklisted = (token) => blacklistedTokens.includes(token);
 
-module.exports = {
-  registerUser,
-  loginUser,
-  logoutUser,
-  isTokenBlacklisted,
-};
+module.exports = { registerUser, loginUser, logoutUser, isTokenBlacklisted };
