@@ -28,8 +28,11 @@ const createUser = async (req, res) => {
     lastname: req.body.lastname,
     email: req.body.email,
     password: req.body.password,
+    phone: req.body.phone, 
+    sector: req.body.sector, 
+    address: req.body.address,
     role: req.body.role || "user",
-    status: req.body.status || "Active", // ✅ set default if not passed
+    status: req.body.status || "Active",
   });
 
   try {
@@ -49,8 +52,11 @@ const updateUser = async (req, res) => {
     if (req.body.firstname) user.firstname = req.body.firstname;
     if (req.body.lastname) user.lastname = req.body.lastname;
     if (req.body.email) user.email = req.body.email;
+    if (req.body.phone) user.phone = req.body.phone; 
+    if (req.body.sector) user.sector = req.body.sector; 
+    if (req.body.address) user.address = req.body.address; 
     if (req.body.role) user.role = req.body.role;
-    if (req.body.status) user.status = req.body.status; // ✅ update status
+    if (req.body.status) user.status = req.body.status;
 
     if (req.body.password && req.body.password.trim() !== "") {
       user.password = req.body.password;
