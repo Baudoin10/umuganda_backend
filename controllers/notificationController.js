@@ -2,55 +2,43 @@
 const notification = require("../models/notificationModel");
 const User = require("../models/userModel"); 
 
-const createNotification = async (req, res) => {
-  const { title, message, targetUserIds } = req.body;
+  const createNotification = async (req, res) => {
+    const { title, message, targetUserIds } = req.body;
 
-  try {
-    if (!title || !message) {
-      return res.status(400).json({ message: "Title and message are required" });
-    }
-    if (targetUserIds === "all") {
-      const users = await User.find({}, '_id');
-      const userIds = users.map(user => user._id);
-      
-      const notifications = userIds.map(userId => ({
+    try {
+      if (!title || !message) {
+        return res
+          .status(400)
+          .json({ message: "Title and message are required" });
+      }
+
+      let finalTargets = [];
+
+      if (targetUserIds === "all") {
+        const users = await User.find({}, "_id");
+        finalTargets = users.map((u) => u._id);
+      } else if (Array.isArray(targetUserIds) && targetUserIds.length > 0) {
+        finalTargets = targetUserIds;
+      } else {
+        return res.status(400).json({ message: "Invalid targetUserIds" });
+      }
+
+      // create **one** notification
+      const notif = await notification.create({
         title,
         message,
-        userId
-      }));
-      
-      // Insert all notifications at once
-      const savedNotifications = await notification.insertMany(notifications);
-      return res.status(201).json({ 
-        message: `Notification sent to ${userIds.length} users`, 
-        count: userIds.length 
+        targetUserIds: finalTargets,
       });
-    } 
-    // Handle specific users
-    else if (Array.isArray(targetUserIds) && targetUserIds.length > 0) {
-      // Create notifications for selected users
-      const notifications = targetUserIds.map(userId => ({
-        title,
-        message,
-        userId
-      }));
-      
-      // Insert all notifications at once
-      const savedNotifications = await notification.insertMany(notifications);
-      return res.status(201).json({ 
-        message: `Notification sent to ${targetUserIds.length} users`, 
-        count: targetUserIds.length 
-      });
-    } else {
-      return res.status(400).json({ 
-        message: "Invalid targetUserIds. Must be 'all' or a non-empty array of user IDs" 
-      });
+
+      return res
+        .status(201)
+        .json({ message: "Notification created", notification: notif });
+    } catch (err) {
+      console.error("Error creating notification:", err);
+      res.status(500).json({ message: err.message });
     }
-  } catch (err) {
-    console.error("Error creating notifications:", err);
-    res.status(500).json({ message: err.message });
-  }
-};
+  };
+
 
 // Get all notifications
 const getNotifications = async (req, res) => {
