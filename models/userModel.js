@@ -10,6 +10,9 @@ const userSchema = new mongoose.Schema({
   address: { type: String }, 
   role: { type: String, enum: ["admin", "user"], default: "user" },
   status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+
+  resetTokenHash: { type: String, default: null },
+  resetTokenExp:  { type: Date,   default: null },
 });
 
 const User = mongoose.model("User", userSchema);
