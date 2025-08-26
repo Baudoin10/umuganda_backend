@@ -4,7 +4,6 @@ const {
   registerUser,
   loginUser,
   logoutUser,
-  // ADD:
   forgetController,
   resetController,
 } = require("../controllers/authController");
