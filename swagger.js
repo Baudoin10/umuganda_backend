@@ -10,30 +10,28 @@ const options = {
       version: "1.0.0",
       description: "API documentation for umuganda",
     },
+    servers: [
+      { url: "https://umuganda-backend.onrender.com" }, // ← your deployed backend
+      { url: "http://localhost:3000" }, // optional local fallback
+    ],
     components: {
       securitySchemes: {
-        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
       },
     },
+    // security: [{ bearerAuth: [] }],
   },
-  apis: ["./routes/*.js"], // your route files
+  apis: ["./routes/*.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 
 const swaggerDocs = (app) => {
-  app.use(
-    "/api-docs",
-    // set the server URL dynamically from the actual request (Render or local)
-    (req, _res, next) => {
-      const proto = req.headers["x-forwarded-proto"] || req.protocol;
-      const host = req.get("host");
-      swaggerSpec.servers = [{ url: `${proto}://${host}` }];
-      next();
-    },
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec)
-  );
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };
 
 module.exports = swaggerDocs;
