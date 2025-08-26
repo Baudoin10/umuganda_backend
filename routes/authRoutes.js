@@ -1,10 +1,12 @@
-
 const express = require("express");
 const router = express.Router();
 const {
   registerUser,
   loginUser,
   logoutUser,
+  // ADD:
+  forgetController,
+  resetController,
 } = require("../controllers/authController");
 
 /**
@@ -79,5 +81,55 @@ router.post("/login", loginUser);
  *         description: Unauthorized
  */
 router.post("/logout", logoutUser);
+
+/**
+ * @swagger
+ * /auth/forgot:
+ *   post:
+ *     summary: Send password reset link to user email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: If account exists, an email is sent
+ *       400:
+ *         description: Invalid input
+ */
+router.post("/forgot", forgetController);
+
+/**
+ * @swagger
+ * /auth/reset:
+ *   post:
+ *     summary: Reset password using emailed token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ */
+router.post("/reset", resetController);
 
 module.exports = router;
