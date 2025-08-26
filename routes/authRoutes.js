@@ -27,11 +27,32 @@ const {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - firstname
+ *               - lastname
+ *               - email
+ *               - password
  *             properties:
- *               username:
+ *               firstname:
  *                 type: string
+ *               lastname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *                 format: password
+ *               phone:
+ *                 type: string
+ *               sector:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *                 default: user
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -52,11 +73,14 @@ router.post("/register", registerUser);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [email, password]
  *             properties:
- *               username:
+ *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *                 format: password
  *     responses:
  *       200:
  *         description: Login successful, returns JWT token
@@ -93,9 +117,11 @@ router.post("/logout", logoutUser);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [email]
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
  *     responses:
  *       200:
  *         description: If account exists, an email is sent
@@ -116,13 +142,16 @@ router.post("/forgot", forgetController);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [email, token, newPassword]
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
  *               token:
  *                 type: string
  *               newPassword:
  *                 type: string
+ *                 format: password
  *     responses:
  *       200:
  *         description: Password reset successful
